@@ -15,14 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * A service to generate a travel recommendation in JSON format (array)
- * based on the user's visited cities.
- *
- * ChatClient is assumed to be configured with openAI or similar LLM,
- * and we strictly request JSON array output. We then parse it into
- * List<TravelRecommendationDto>.
- */
+
 @Slf4j
 @Service
 public class RecommendationAiService {
@@ -44,27 +37,21 @@ public class RecommendationAiService {
         this.objectMapper = objectMapper;
     }
 
-    /**
-     * 1) Fetch user's visited cities from DB
-     * 2) Build a prompt requesting strictly JSON array output (multiple city info)
-     * 3) Invoke chatClient -> parse JSON array -> return as List<TravelRecommendationDto>
-     */
+
     public List<TravelRecommendationDto> recommendCitiesBasedOnUser(String userId) {
-        // 1) Find user or throw
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
-        // 2) Build a descriptive prompt with visited city info
         String prompt = buildJsonPrompt(user);
 
-        // 3) Call AI
+
         String rawResponse = chatClient
                 .prompt()
                 .user(prompt)
                 .call()
                 .content();  // raw string from AI
 
-        // 4) Parse JSON array into List<TravelRecommendationDto>
+
         try {
             return objectMapper.readValue(
                     rawResponse,
@@ -76,9 +63,7 @@ public class RecommendationAiService {
         }
     }
 
-    /**
-     * Helper method to create a prompt that requests an array of recommended cities in valid JSON.
-     */
+
     private String buildJsonPrompt(User user) {
         StringBuilder sb = new StringBuilder();
 
@@ -101,7 +86,7 @@ public class RecommendationAiService {
                 Each element must be:
                 {
                   "cityName": "string",
-                  "countryAbbreviation": "string",
+                  "countryName":"string",
                   "climate": "string",
                   "exchangeRateUsd": number,
                   "touristSpots": ["string","string","string"]
