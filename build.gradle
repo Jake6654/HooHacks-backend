@@ -46,14 +46,12 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// Spring Boot Thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	// Spring Security + Thymeleaf 연동 (선택)
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
-	// Lombok 추가
+
 	implementation 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-	// 테스트에서도 Lombok 사용 가능하도록 추가
 	testImplementation 'org.projectlombok:lombok:1.18.30'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
