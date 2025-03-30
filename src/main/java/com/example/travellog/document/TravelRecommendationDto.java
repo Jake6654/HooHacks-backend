@@ -9,6 +9,7 @@ public class TravelRecommendationDto {
     private String cityName;
     private String climate;
     private double exchangeRateUsd;
+    private String countryName;
     private List<String> touristSpots;
     private String reason;
 
