@@ -1,13 +1,12 @@
 package com.example.travellog.service;
 
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import groovy.util.logging.Slf4j;
 import com.example.travellog.document.TravelRecommendationDto;
 import com.example.travellog.document.User;
 import com.example.travellog.repository.CityRepository;
 import com.example.travellog.repository.UserRepository;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import groovy.util.logging.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -15,7 +14,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
+/**
+ * A service to generate a travel recommendation in JSON format (array)
+ * based on the user's visited cities.
+ *
+ * ChatClient is assumed to be configured with openAI or similar LLM,
+ * and we strictly request JSON array output. We then parse it into
+ * List<TravelRecommendationDto>.
+ */
 @Slf4j
 @Service
 public class RecommendationAiService {
@@ -37,21 +43,22 @@ public class RecommendationAiService {
         this.objectMapper = objectMapper;
     }
 
+    public List<TravelRecommendationDto> recommendCitiesBasedOnUser(String email) {
+        // 1) Find user or throw
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
 
-    public List<TravelRecommendationDto> recommendCitiesBasedOnUser(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
-
+        // 2) Build a descriptive prompt with visited city info
         String prompt = buildJsonPrompt(user);
 
-
+        // 3) Call AI
         String rawResponse = chatClient
                 .prompt()
                 .user(prompt)
                 .call()
                 .content();  // raw string from AI
 
-
+        // 4) Parse JSON array into List<TravelRecommendationDto>
         try {
             return objectMapper.readValue(
                     rawResponse,
@@ -86,7 +93,7 @@ public class RecommendationAiService {
                 Each element must be:
                 {
                   "cityName": "string",
-                  "countryName":"string",
+                  "countryName": "string",
                   "climate": "string",
                   "exchangeRateUsd": number,
                   "touristSpots": ["string","string","string"]

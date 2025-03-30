@@ -40,7 +40,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        log.info("Check JWT Token: {}", token);
 
         if (token != null) {
             try {
@@ -48,7 +47,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String email = claims.getSubject();
 
                 if (claims.getExpiration().before(new Date())) {
-                    log.info("JWT expired");
                     response.addCookie(createExpiredJwtCookie());
                     SecurityContextHolder.clearContext();
                     chain.doFilter(request, response);
@@ -68,7 +66,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
         } else {
-            log.info("No JWT, Not verified ");
         }
 
         chain.doFilter(request, response);

@@ -21,23 +21,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final UserRepository userRepository;
 
+
     public CustomOAuth2UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
 
-    /**
-     * This method is called during the actual OAuth2 login process
-     * - userRequest: Information received from the provider(Google) including access token
-     * - 반환값: OAuth2User (User information that will be stored in the Security after login)
-     */
+
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
+
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        log.info(" attributes: {}", attributes);
+        log.info("OAuth2 Provider에서 받은 attributes: {}", attributes);
 
 
         String email = (String) attributes.get("email");
@@ -45,13 +43,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String photoUrl = (String) attributes.get("picture");
 
         if (email == null) {
-            throw new OAuth2AuthenticationException("Email not found. Please check the OAuth2 provider");
+            throw new OAuth2AuthenticationException("이메일 정보가 없습니다. 다른 OAuth2 프로바이더를 확인하세요.");
         }
 
 
-        log.info("Extracted email: {}, name: {}, picture: {}", email, name, photoUrl);
+        log.info("추출된 email: {}, name: {}, picture: {}", email, name, photoUrl);
 
-        // check logic
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     User newUser = new User();
@@ -60,6 +57,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     newUser.setPhotoUrl(photoUrl);
                     return userRepository.save(newUser);
                 });
+
 
         return new DefaultOAuth2User(
                 Collections.emptyList(),

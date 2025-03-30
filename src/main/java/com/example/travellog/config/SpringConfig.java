@@ -1,6 +1,5 @@
 package com.example.travellog.config;
 
-
 import com.example.travellog.security.JwtAuthFilter;
 import com.example.travellog.security.JwtTokenProvider;
 import com.example.travellog.service.CustomOAuth2UserService;
@@ -46,7 +45,6 @@ public class SpringConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        // OAuth2 로그인 시 사용자 정보를 가져올 때 CustomOAuth2UserService를 사용하도록 등록
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(customOAuth2UserService)
                         )
@@ -77,12 +75,12 @@ public class SpringConfig {
                 log.info("OAuth2 인증 실패");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"OAuth2 validation failed\"}");
+                response.getWriter().write("{\"error\": \"OAuth2 인증 실패\"}");
                 return;
             }
 
-            String jwtToken = generateJwtToken(authentication);
-
+           String jwtToken = generateJwtToken(authentication);
+            log.info("JWT 발급 완료: {}", jwtToken);
 
             Cookie jwtCookie = new Cookie("jwt", jwtToken);
             jwtCookie.setHttpOnly(true);
@@ -91,7 +89,7 @@ public class SpringConfig {
             jwtCookie.setMaxAge(7 * 24 * 60 * 60);
             jwtCookie.setAttribute("SameSite", "Lax");
 
-            response.addCookie(jwtCookie);
+            response.addCookie(jwtCookie); // 쿠키를 클라이언트에 전달
             response.sendRedirect("http://localhost:5173/profile");
 
         };

@@ -9,9 +9,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpringAiConfig {
 
+
     @Bean
-    public ChatClient chatClient(ChatClient.Builder chatClientBuilder) {
+    public ChatClient chatClient(ChatClient.Builder chatClientBuilder){
         return chatClientBuilder.defaultAdvisors(
                 new MessageChatMemoryAdvisor(new InMemoryChatMemory())).build();
+
     }
 }
+

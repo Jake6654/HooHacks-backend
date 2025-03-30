@@ -1,3 +1,4 @@
+
 package com.example.travellog.document;
 
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Document(collection = "cities")
 public class City {
+
     @Id
     private String id;
 
@@ -25,4 +27,5 @@ public class City {
         private double lng; //longitude
 
     }
+
 }

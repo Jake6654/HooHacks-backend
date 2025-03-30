@@ -1,9 +1,8 @@
 package com.example.travellog.controller;
 
-
 import com.example.travellog.document.User;
 import com.example.travellog.document.VisitedCity;
-import com.example.travellog.document.VisitedCityDto;
+import com.example.travellog.document.VisitedCityDTO;
 import com.example.travellog.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,9 +25,10 @@ public class VisitedCityController {
         this.userRepository = userRepository;
     }
 
+
     @PostMapping("/submit")
     public ResponseEntity<?> addVisitedCityForm(
-            @RequestBody VisitedCityDto dto,
+            @RequestBody VisitedCityDTO dto,
             Authentication authentication
     ) {
 
@@ -36,12 +36,10 @@ public class VisitedCityController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found by email: " + email));
-
 
         VisitedCity newVisited = new VisitedCity();
         newVisited.setCityName(dto.getCityName());
@@ -57,13 +55,14 @@ public class VisitedCityController {
         user.getVisitedCities().add(newVisited);
         userRepository.save(user);
 
-
         return ResponseEntity.ok(newVisited);
 
     }
 
+
     @GetMapping("visitedcities")
     public ResponseEntity<?> getVisitedCities(Authentication authentication) {
+
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
@@ -76,23 +75,20 @@ public class VisitedCityController {
             return ResponseEntity.notFound().build();
         }
 
-
         return ResponseEntity.ok(userOpt.get().getVisitedCities());
     }
+
 
     @GetMapping("/visitedcities/{id}")
     public ResponseEntity<?> getVisitedCityById(
             @PathVariable String id,
             Authentication authentication
     ) {
-
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
-
         String email = authentication.getName();
-
 
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
@@ -101,12 +97,10 @@ public class VisitedCityController {
 
 
         return userOpt.get().getVisitedCities().stream()
-                .filter(city -> id.equals(city.getId()))
+                .filter(city -> id.equals(city.getId())) // city.getId()는 @Id 필드
                 .findFirst()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-
-
     }
 
     @DeleteMapping("/visitedcities/{id}")
@@ -117,6 +111,7 @@ public class VisitedCityController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
+
 
         String email = authentication.getName();
         Optional<User> userOpt = userRepository.findByEmail(email);
@@ -129,11 +124,12 @@ public class VisitedCityController {
         boolean removed = user.getVisitedCities().removeIf(city -> id.equals(city.getId()));
 
         if (removed) {
-            userRepository.save(user); // 변경사항 저장
+            userRepository.save(user);
             return ResponseEntity.ok(Map.of("message", "Visited city deleted successfully"));
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "City with ID " + id + " not found"));
         }
     }
+
 }

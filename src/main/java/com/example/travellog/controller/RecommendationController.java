@@ -21,6 +21,7 @@ public class RecommendationController {
 
     @GetMapping("/rec")
     public ResponseEntity<List<TravelRecommendationDto>> recommendCitiesJson(Authentication authentication) {
+
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
