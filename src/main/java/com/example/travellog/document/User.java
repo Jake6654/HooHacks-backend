@@ -7,7 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Setter
@@ -24,7 +25,7 @@ public class User {
     private String photoUrl;
     private LocalDate accountCreatedDate;
 
-    // private List<VisitedCity> visitedCities = new ArrayList<>();
+    private List<VisitedCity> visitedCities = new ArrayList<>();
 
 
 

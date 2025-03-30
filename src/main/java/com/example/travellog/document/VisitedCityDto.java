@@ -8,9 +8,10 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class VisitedCityDto {
-    private String cityId;
-    private LocalDate visitedAt;
-    private String description;
-    private java.util.List<String> photos;
+    private String cityName;
+    private String lat;
+    private String lng;
+    private String date;
+    private String notes;
     private boolean liked;
 }
